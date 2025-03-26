@@ -20,13 +20,19 @@ These schemas help with data validation and serialization between the client and
 # Ensure your schemas reuse the models defined in app/models.py where appropriate.
 #
 # Example:
-#
-# from pydantic import BaseModel
-#
-# class CreateProductRequest(BaseModel):
-#     # TODO: Define required fields for creating a product
-#     pass
-#
-# class CreateProductResponse(BaseModel):
-#     # TODO: Define response fields including an 'id' field
-#     pass
+
+
+from pydantic import BaseModel
+from beanie import PydanticObjectId
+from app.models import Product
+
+class CreateProductRequest(Product, BaseModel):
+    pass
+
+class CreateProductResponse(Product, BaseModel):
+    id: PydanticObjectId
+
+class GetProductResponse(CreateProductResponse):
+    pass
+class GetProductRequest(CreateProductRequest):
+    pass
