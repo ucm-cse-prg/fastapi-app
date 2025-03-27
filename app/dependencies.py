@@ -3,8 +3,9 @@ from functools import wraps
 
 from fastapi import HTTPException
 
-from app.exceptions import APIException
-
+from app.exceptions import APIException, Product
+from app.documents import Product
+from Beanie import PydanticObjectId
 
 @typing.no_type_check
 def http_request_dependency(func):
@@ -35,10 +36,12 @@ def http_request_dependency(func):
 
 # CHALLENGE:
 # Consider using dependency injection to handle common operations like retrieving a product by ID.
-#
-# Example:
-#
-# @http_request_dependency
-# async def get_product_by_id(product_id: PydanticObjectId) -> Product:
-#   TODO: Implement logic to retrieve a product by ID
-#   pass
+
+
+@http_request_dependency
+async def get_product_by_id(product_id: PydanticObjectId) -> Product:
+    product: Product | None = await Product.get(product_id)
+
+    if not product:
+        raise ProductNotFound(product_id)
+    return Product

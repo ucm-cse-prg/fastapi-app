@@ -46,5 +46,9 @@ class InternalServerError(APIException):
 #
 # Example:
 #
-# class ProductNotFound(APIException):
-#     TODO: Implement creation logic
+class ProductNotFound(APIException):
+    def __init__(self, product_id: PydanticObjectId):
+        super().__init__(
+            code=status.HTTP_404_NOT_FOUND,
+            detail=f"Product with ID {product_id} not found",
+        )
