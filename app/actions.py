@@ -1,7 +1,8 @@
 import typing
+from typing import Optional
 from functools import wraps
 from app.exceptions import InternalServerError
-from Beanie import PydanticObjectId
+from beanie import PydanticObjectId
 from app.documents import Product
 from app.models import Category
 
@@ -40,13 +41,13 @@ def run_action(action):
 
 
 
-async def create_product(name: str, price: float, category: CategoryType, description: str = "") -> Product:
-    newProdcut: Product = await Product(name=name,description=description, price=price, category=category).insert()
+async def create_product(name: str, price: float, category: Category, description: str = "") -> Product:
+    new_prodcut: Product = await Product(name=name,description=description, price=price, category=category).insert()
 
-    if not newProduct:
+    if not new_prodcut:
         raise InternalServerError("Failed to create product")
 
-    return newProduct
+    return new_prodcut
 
 
 async def get_product(product: Product) -> Product:
@@ -75,7 +76,7 @@ async def update_product(product: Product,
     return product
 
 async def delete_product(product: Product) -> Product:
-    await delete(product)
+    await Product.delete(product)
 
     if await Product.get(product.id):
         raise InternalServerError("Failed to delete product")

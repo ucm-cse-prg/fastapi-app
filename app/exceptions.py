@@ -1,6 +1,8 @@
 import logging
 
 from fastapi import status
+from beanie import PydanticObjectId
+from app.documents import Product
 
 logger = logging.getLogger("uvicorn.error")
 

@@ -24,7 +24,8 @@ These schemas help with data validation and serialization between the client and
 
 from pydantic import BaseModel
 from beanie import PydanticObjectId
-from app.models import Product
+from app.models import Product, Category
+from typing import Optional
 
 class CreateProductRequest(Product, BaseModel):
     pass
@@ -35,4 +36,13 @@ class CreateProductResponse(Product, BaseModel):
 class GetProductResponse(CreateProductResponse):
     pass
 class GetProductRequest(CreateProductRequest):
+    pass
+
+class UpdateProductRequest(Product, BaseModel):
+    name: Optional[str] = None  
+    description: Optional[str] = None  
+    price: Optional[float] = None  
+    category: Optional[Category] = None
+
+class UpdateProductResponse(GetProductResponse, BaseModel):
     pass

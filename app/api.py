@@ -1,4 +1,10 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException, status
+from app.documents import Product
+from app.dependencies import get_product_by_id
+from app.models import Category
+import app.schemas as Schemas
+import app.actions as Actions
+from app.exceptions import APIException, InternalServerError, ProductNotFound
 
 router = APIRouter()
 
@@ -18,9 +24,35 @@ router = APIRouter()
 # - Delegate business logic to functions in the actions module.
 # - Return appropriate responses and status codes.
 #
-# Example (for guidance):
-#
-# @router.post("/", response_model=YourCreateProductResponseSchema, status_code=201)
-# async def create_product_endpoint(product: YourCreateProductRequestSchema):
-#     # TODO: Implement creation logic using your actions function
-#     pass
+
+@router.get("/{product_id}", response_model=Schemas.GetProductResponse)
+async def get_product(product: Product = Depends(get_product_by_id)):
+    try:
+        return await Actions.get_product(product)
+    except APIException as e:
+        raise HTTPException(status_code=e.code, detail=e.detail) 
+
+@router.post("/", response_model=Schemas.CreateProductResponse, status_code=201)
+async def create_product(product: Schemas.CreateProductRequest) -> Product:
+    try:
+        return await Actions.create_product(**product.model_dump())
+    except APIException as e:
+        raise HTTPException(status_code=e.code, detail=e.detail)
+
+@router.patch("/{product_id}", response_model=Schemas.UpdateProductResponse)
+async def update_product(
+    request_body: Schemas.UpdateProductRequest, product: Product = Depends(get_product_by_id)) -> Product:
+    try:
+        return await Actions.update_product(product, **request_body.model_dump())
+    except APIException as e:
+        raise HTTPException(status_code=e.code, detail=e.detail)
+
+@router.delete("/{product_id}",status_code=status.HTTP_204_NO_CONTENT,responses={404: {"description": "Product not found"}})
+async def delete_product(product: Product = Depends(get_product_by_id)):
+    try:
+        await Actions.delete_product(product)
+    except APIException as e:
+        raise HTTPException(status_code=e.code, detail=e.detail)
+
+
+

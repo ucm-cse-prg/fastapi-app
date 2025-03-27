@@ -43,7 +43,15 @@ class Product(BaseModel):
     price (float) - the price of the product
     category (Category) - the category of the product
     '''
-    name: str
+    name: str = Field(
+    default_factory=str,
+    title="Name",
+    description="Name of the product",
+    max_length=20,
+    min_length=2,
+    pattern=r"^[\w-]+$",
+    examples=["SM-G973F", "iPhone 12"],
+    )
     
     description: str
 

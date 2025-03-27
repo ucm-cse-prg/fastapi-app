@@ -3,9 +3,9 @@ from functools import wraps
 
 from fastapi import HTTPException
 
-from app.exceptions import APIException, Product
+from app.exceptions import APIException, ProductNotFound
 from app.documents import Product
-from Beanie import PydanticObjectId
+from beanie import PydanticObjectId
 
 @typing.no_type_check
 def http_request_dependency(func):
