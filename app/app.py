@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import router as api_router
 from app.config import get_settings
@@ -35,6 +36,15 @@ async def lifespan(app: FastAPI) -> AsyncGenerator:
 
 # Create a FastAPI application instance, using the custom lifespan context manager.
 app = FastAPI(lifespan=lifespan)
+
+# Apply middleware settings from the configuration.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=SETTINGS.origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Include API routes for product management.
 # The "api_router" contains all the endpoint definitions and is mounted under "/products".
