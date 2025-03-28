@@ -1,6 +1,36 @@
 # CHANGELOG
 
 
+## v0.2.0 (2025-03-28)
+
+### Chores
+
+- Bump fastapi-app version to 0.1.5
+  ([`9b06b2f`](https://github.com/ucm-cse-prg/fastapi-app/commit/9b06b2fc9e8a30c3f09a32c09d6bc86a0127e87b))
+
+### Features
+
+- Add CORS middleware to FastAPI application
+  ([`c531739`](https://github.com/ucm-cse-prg/fastapi-app/commit/c531739424f1111d65f724f8e7707cbee3e9e4e1))
+
+- Add CSV loading for categories and products in test_api.py
+  ([`ad7a7e8`](https://github.com/ucm-cse-prg/fastapi-app/commit/ad7a7e8c542e7b24b5432de503820b6d549a5f86))
+
+### Refactoring
+
+- Update Category and Product models
+  ([`3aef355`](https://github.com/ucm-cse-prg/fastapi-app/commit/3aef355c7479c2ef3427cccaf73270b7b630f61e))
+
+Updated Category and Product models to extend name and description length limits and allow
+  additional characters
+
+- Update CreateProductResponse to inherit from GetProductResponse
+  ([`2f5d2f8`](https://github.com/ucm-cse-prg/fastapi-app/commit/2f5d2f8c80e903b2d9732693d4e0fac6fdf4f605))
+
+- Update product retrieval to use Product object instead of ID
+  ([`2e4e995`](https://github.com/ucm-cse-prg/fastapi-app/commit/2e4e995784b5c7a4ed2d884cfcd2f9de4613ac83))
+
+
 ## v0.1.5 (2025-03-12)
 
 ### Bug Fixes
