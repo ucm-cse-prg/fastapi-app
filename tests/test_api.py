@@ -5,6 +5,9 @@ This module includes tests for creating, retrieving, updating, and deleting prod
 Each test function interacts with the API endpoints and asserts the expected responses.
 """
 
+import csv
+import os
+
 import pytest
 from faker import Faker
 from httpx import AsyncClient
@@ -14,6 +17,19 @@ from rich import print
 fake = Faker()
 
 pytestmark = pytest.mark.asyncio
+
+
+script_dir = os.path.dirname(__file__)
+
+# Load categories from a CSV file for testing purposes.
+with open(f"{script_dir}/categories.csv", mode="r") as file:
+    reader = csv.DictReader(file)
+    categories = [row for row in reader]
+
+# Load products from a CSV file for testing purposes.
+with open(f"{script_dir}/products.csv", mode="r") as file:
+    reader = csv.DictReader(file)
+    products = [row for row in reader]
 
 
 # Test Category model using Pydantic
@@ -62,10 +78,18 @@ def create_random_product() -> TestProduct:
     Returns:
         TestProduct: A new product instance with random data.
     """
-    name: str = fake.word()
+
+    random_product = products[fake.random_int(0, len(products) - 1)]
+    random_category = [
+        cat for cat in categories if cat["CategoryID"] == random_product["Category"]
+    ]
+
+    name: str = random_product["Name"]
     price: float = float(fake.random_number(2)) + 0.99
-    description: str = fake.sentence()
-    category: TestCategory = TestCategory()
+    description: str = random_product["Description"]
+    category: TestCategory = TestCategory(
+        name=random_category[0]["Name"], description=random_category[0]["Description"]
+    )
     return TestProduct(
         name=name, price=price, description=description, category=category
     )
@@ -93,6 +117,7 @@ async def test_create_product(
     # Send POST request to create the product
     response = await client_test.post("/products/", json=new_product.model_dump())
     # Assert that the product is created successfully
+    print("Response from creating product: ", response.json())
     assert response.status_code == 201
     response = response.json()
     # Validate returned fields
@@ -218,11 +243,11 @@ async def test_create_product_invalid_name(client_test: AsyncClient) -> None:
     """
     Test for creating a product with an invalid name.
 
-    The name includes spaces and violates the expected regex pattern.
+    The name includes asterisks and violates the expected regex pattern.
     Expects a 422 status code due to validation error.
     """
     invalid_product = {
-        "name": "Invalid Name",  # Contains a space, violating the regex
+        "name": "Invalid * Name",  # Contains asterisk, which is invalid
         "description": "Valid product description",
         "price": 999.99,
         "category": {"name": "Phones", "description": "Mobile phones"},
