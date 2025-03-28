@@ -13,25 +13,25 @@ class Category(BaseModel):
     Data model representing a product category.
 
     Attributes:
-        name (str): The name of the category. Must be 2-20 characters long and
-                    match the pattern allowing alphanumeric characters, underscores, or dashes.
-        description (str): A brief description of the category. Maximum 100 characters.
+        name (str): The name of the category. Must be 2-50 characters long and
+                    match the pattern allowing alphanumeric characters, underscores, spaces, or ampersands (&).
+        description (str): A brief description of the category. Maximum 200 characters.
     """
 
     name: str = Field(
         default_factory=str,
         title="Name",
         description="Name of the category",
-        max_length=20,
+        max_length=50,
         min_length=2,
-        pattern=r"^[\w-]+$",
+        pattern=r"^[\w\s&]+$",
         examples=["Phones", "Accessories"],
     )
     description: str = Field(
         default="",
         title="Description",
         description="Description of the category",
-        max_length=100,
+        max_length=200,
         examples=["Mobile phones", "Smartphone watches, headphones, and chargers"],
     )
 
@@ -41,9 +41,9 @@ class Product(BaseModel):
     Data model representing a product.
 
     Attributes:
-        name (str): The name of the product. Must be 2-20 characters long and
-                    match the pattern allowing alphanumeric characters, underscores, or dashes.
-        description (str): A detailed description of the product. Maximum 100 characters.
+        name (str): The name of the product. Must be 2-50 characters long and
+                    match the pattern allowing alphanumeric characters, spaces, or dashes.
+        description (str): A detailed description of the product. Maximum 200 characters.
         price (float): The price of the product. Must be greater than 0 and less than 100000.
                        Additionally, the price must end with a '0.99' fractional component.
         category (Category): The category to which the product belongs.
@@ -53,16 +53,16 @@ class Product(BaseModel):
         default_factory=str,
         title="Name",
         description="Name of the product",
-        max_length=20,
+        max_length=50,
         min_length=2,
-        pattern=r"^[\w-]+$",
+        pattern=r"^[\w\s-]+$",
         examples=["SM-G973F", "iPhone 12"],
     )
     description: str = Field(
         default="",
         title="Description",
         description="Description of the product",
-        max_length=100,
+        max_length=200,
         examples=["Samsung Galaxy S10", "The latest iPhone"],
     )
     price: float = Field(
