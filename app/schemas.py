@@ -31,28 +31,36 @@ These schemas help with data validation and serialization between the client and
 #     # TODO: Define response fields including an 'id' field
 #     pass
 
-from pydantic import BaseModel
-from app.models import Product, Category
+from typing import Optional
+
 from beanie import PydanticObjectId
-from typing import Optional, List
+from pydantic import BaseModel
+
+from app.models import Category, Product
+
+
+class GetProductResponse(Product, BaseModel):
+    id: PydanticObjectId  # Unique identifier for the product
+
+
+class GetAllProductsResponse(BaseModel):
+    products: list[GetProductResponse]  # List of product responses
+
 
 class CreateProductRequest(Product, BaseModel):
     pass
 
-class CreateProductResponse(Product, BaseModel):
-    id: PydanticObjectId
 
-class GetProductResponse(Product, BaseModel):
-    id: PydanticObjectId
+class CreateProductResponse(GetProductResponse, BaseModel):
+    pass
 
-class UpdateProductRequest(BaseModel):
-    name: Optional[str] = None
-    description: Optional[str] = None
-    price: Optional[float] = None
-    category: Optional[Category] = None
+
+class UpdateProductRequest(Product, BaseModel):
+    name: Optional[str] = None  # type: ignore
+    description: Optional[str] = None  # type: ignore
+    price: Optional[float] = None  # type: ignore
+    category: Optional[Category] = None  # type: ignore
+
 
 class UpdateProductResponse(GetProductResponse, BaseModel):
-    id: PydanticObjectId
-
-class GetAllProductsResponse(BaseModel):
-    products: List[GetProductResponse]
+    pass

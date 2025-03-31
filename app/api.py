@@ -1,81 +1,73 @@
-from fastapi import APIRouter, HTTPException
-from app.schemas import CreateProductRequest, CreateProductResponse, GetProductResponse, UpdateProductRequest, UpdateProductResponse, GetAllProductsResponse
-from app.actions import create_product, get_all_products, update_product, delete_product, get_product
-from app.documents import ProductDocument
-from beanie import PydanticObjectId
+from typing import Literal
 
-import app.exceptions as exceptions
+from fastapi import APIRouter, Depends, HTTPException, status
 
-from typing import Literal, Optional
+import app.actions as Actions
+import app.documents as Documents
+import app.schemas as Schemas
+from app.dependencies import product_dependency
+from app.exceptions import APIException
 
 router = APIRouter()
 
-# CHALLENGE:
-# Remove any working CRUD implementations.
-# Your task is to implement the following API endpoints using the Pydantic schemas,
-# Beanie documents, and actions that you will build:
-#
-# - GET /products/      -> Retrieve all products.
-# - GET /products/{id}  -> Retrieve a product by ID.
-# - POST /products/     -> Create a new product.
-# - PATCH /products/{id} -> Update an existing product.
-# - DELETE /products/{id} -> Delete a product.
-#
-# For each endpoint:
-# - Validate the incoming data using your custom Pydantic schemas.
-# - Delegate business logic to functions in the actions module.
-# - Return appropriate responses and status codes.
-#
-# Example (for guidance):
-#
-# @router.post("/", response_model=YourCreateProductResponseSchema, status_code=201)
-# async def create_product_endpoint(product: YourCreateProductRequestSchema):
-#     # TODO: Implement creation logic using your actions function
-#     pass
 
-@router.post("/", response_model=CreateProductResponse, status_code=201)
-async def create_product_endpoint(product: CreateProductRequest) -> ProductDocument:
+@router.get("/", response_model=Schemas.GetAllProductsResponse)
+async def get_products() -> dict[Literal["products"], list[Documents.Product]]:
     try:
-        return await create_product(**product.model_dump())
-    except exceptions.ProductNotFound as e:
-        raise HTTPException(
-            status_code=e.code,
-            detail=e.detail
-        )
-
-@router.get("/", response_model=GetAllProductsResponse, status_code=200)
-async def get_all_products_endpoint() -> dict[Literal['products'], list[ProductDocument]]:
-    try:
-        products: list[ProductDocument] = await get_all_products()
+        # Retrieve all products from the database.
+        products: list[Documents.Product] = await Actions.get_all_products()
         return {"products": products}
-    except exceptions.InternalServerError as e:
-        raise HTTPException(
-            status_code=e.code,
-            detail=e.detail
-        )
+    except APIException as e:
+        # Raise HTTP exception if an API specific error occurs.
+        raise HTTPException(status_code=e.code, detail=e.detail)
 
-@router.get("/{product_id}", response_model=GetProductResponse, status_code=200)
-async def get_product_endpoint(product_id: PydanticObjectId) -> ProductDocument:
-        return await get_product(product_id)
-    
 
-@router.patch("/{product_id}", response_model=UpdateProductResponse, status_code=200)
-async def update_product_endpoint(request_body: UpdateProductRequest, product: ProductDocument ) -> ProductDocument:
+@router.get("/{product_id}", response_model=Schemas.GetProductResponse)
+async def get_product(
+    product: Documents.Product = Depends(product_dependency),
+) -> Documents.Product:
     try:
-        return await update_product(product, **request_body.model_dump())
-    except exceptions.ProductNotFound as e:
-        raise HTTPException(
-            status_code=e.code,
-            detail=e.detail
-        )
+        # Retrieve the product using the provided product_id.
+        return await Actions.get_product(product)
+    except APIException as e:
+        # Convert API exception to HTTP exception.
+        raise HTTPException(status_code=e.code, detail=e.detail)
 
-@router.delete("/{product_id}", status_code=204)
-async def delete_product_endpoint(product: ProductDocument) -> None:
+
+@router.post("/", response_model=Schemas.CreateProductResponse, status_code=201)
+async def create_product(product: Schemas.CreateProductRequest) -> Documents.Product:
     try:
-        await delete_product(product)
-        return None
-    except exceptions.ProductNotFound as e:
-        raise HTTPException(
-            status_code=e.code,
-            detail=e.detail
-        )
+        # Using the product data to create a new product.
+        return await Actions.create_product(**product.model_dump())
+    except APIException as e:
+        # Convert API exception to HTTP exception.
+        raise HTTPException(status_code=e.code, detail=e.detail)
+
+
+@router.patch("/{product_id}", response_model=Schemas.UpdateProductResponse)
+async def update_product(
+    request_body: Schemas.UpdateProductRequest,
+    product: Documents.Product = Depends(product_dependency),
+) -> Documents.Product:
+    try:
+        # Update the product with the new values provided.
+        return await Actions.update_product(product, **request_body.model_dump())
+    except APIException as e:
+        # Handle API exception by converting it into an HTTP exception.
+        raise HTTPException(status_code=e.code, detail=e.detail)
+
+
+@router.delete(
+    "/{product_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    responses={404: {"description": "Product not found"}},
+)
+async def delete_product(
+    product: Documents.Product = Depends(product_dependency),
+) -> None:
+    try:
+        # Delete the product using the delete_product action.
+        await Actions.delete_product(product)
+    except APIException as e:
+        # Convert API exception to HTTP exception if deletion fails.
+        raise HTTPException(status_code=e.code, detail=e.detail)

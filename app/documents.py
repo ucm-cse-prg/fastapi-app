@@ -24,8 +24,8 @@ to define the schema of documents stored in the MongoDB collection.
 # Note: Replace 'YourProductModel' with the Pydantic model you defined in app/models.py.
 
 from beanie import Document
-from app.models import Product
+from app.models import Product as ProductModel
 
-class ProductDocument(Document, Product):
+class Product(Document, ProductModel):
     class Settings:
         name = "products"

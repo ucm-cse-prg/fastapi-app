@@ -1,13 +1,10 @@
-import typing 
-from typing import Optional
+import typing
 from functools import wraps
+from typing import Optional
 
+from app.documents import Product
 from app.exceptions import InternalServerError
-
-from app.documents import ProductDocument
-from beanie import PydanticObjectId
 from app.models import Category
-from app.dependencies import get_product_by_id
 
 
 # Wrapper function to run action and rais InternalServerError if it fails
@@ -25,64 +22,63 @@ def run_action(action):
     return wrapper
 
 
-# CHALLENGE:
-# Remove the existing CRUD business logic.
-# Your task is to implement the action functions that will perform the following:
-#
-# - Create a new product:
-#     * Validate inputs.
-#     * Insert the new product into the MongoDB collection using Beanie.
-# - Retrieve products:
-#     * Get all products or a specific product by ID.
-# - Update an existing product:
-#     * Apply changes to the product object.
-#     * Save the updated product to the database.
-# - Delete a product:
-#     * Remove the product document from the database.
-#
-# Define functions like create_product, get_product, update_product, delete_product with appropriate signatures.
-#
-# Example:
-#
-# async def create_product(name: str, price: float, category: YourCategoryType, description: str = "") -> YourProductType:
-#     # TODO: Implement creation logic
-#     pass
-
+# List all products
 @run_action
-async def get_all_products() -> list[ProductDocument]:
-    all_products: ProductDocument = await ProductDocument.all().to_list()
-    return all_products
+async def get_all_products() -> list[Product]:
+    products: list[Product] = await Product.find_all().to_list()
+    return products
 
-async def create_product(name: str, price: float, category: str, description: str = "") -> ProductDocument:
-    price = ProductDocument.price_check(price)
-    
-    new_product: ProductDocument = await ProductDocument(
-        name=name,
-        price=price,
-        category=category,
-        description=description
+
+# Get a single product
+async def get_product(product: Product) -> Product:
+    return product
+
+
+# Create a new product
+async def create_product(
+    name: str,
+    price: float,
+    category: Category,
+    description: str = "",
+) -> Product:
+    new_product: Product = await Product(
+        name=name, description=description, price=price, category=category
     ).insert()
-    
+
     if not new_product:
-        raise InternalServerError("Failed to create product.")
+        raise InternalServerError("Failed to create product")
 
     return new_product
 
-async def get_product(product_id: PydanticObjectId) -> ProductDocument:
-    return await get_product_by_id(product_id)
 
-async def update_product(product: ProductDocument, name: Optional[str], price: Optional[float], category: Optional[Category], description: Optional[str]) -> ProductDocument:
-    if name: 
+# Update a product
+async def update_product(
+    product: Product,
+    name: Optional[str] = None,
+    description: Optional[str] = None,
+    price: Optional[float] = None,
+    category: Optional[Category] = None,
+) -> Product:
+    if name:
         product.name = name
+    if description:
+        product.description = description
     if price:
         product.price = price
     if category:
         product.category = category
-    if description:
-        product.description = description
+
+    # Update the product
     await product.save()
+
+    if not product:
+        raise InternalServerError("Failed to update product")
 
     return product
 
-async def delete_product(product: ProductDocument) -> None:
-    await product.delete()
+
+async def delete_product(product: Product) -> None:
+    await Product.delete(product)
+
+    if await Product.get(product.id):
+        raise InternalServerError("Failed to delete product")

@@ -9,7 +9,7 @@ from beanie import init_beanie
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from app.config import get_settings
-from app.documents import ProductDocument
+from app.documents import Product
 
 # Retrieve application settings which include MongoDB connection details.
 SETTINGS = get_settings()
@@ -34,7 +34,7 @@ async def init_mongo() -> None:
     db = client[SETTINGS.db_name]
 
     # Initialize Beanie with the database and the list of document models.
-    await init_beanie(database=db, document_models=[ProductDocument])
+    await init_beanie(database=db, document_models=[Product])
 
 
 async def drop_database() -> None:

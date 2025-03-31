@@ -33,53 +33,53 @@ from pydantic import BaseModel, Field, field_validator
 
 class Category(BaseModel):
     name: str = Field(
-        ...,
-        title="Category Name",
-        description="The name of the category.",
-        min_length=1,
-        max_length=50, 
-        pattern=r"^[\w-]+$",
-        examples=["Phones", "Laptops"]
+        default_factory=str,
+        title="Name",
+        description="Name of the category",
+        max_length=50,
+        min_length=2,
+        pattern=r"^[\w\s&]+$",
+        examples=["Phones", "Accessories"],
     )
     description: str = Field(
-        ...,
-        title="Category Description",
-        description="The description of the category.",
-        min_length=1,
-        max_length=255
+        default="",
+        title="Description",
+        description="Description of the category",
+        max_length=200,
+        examples=["Mobile phones", "Smartphone watches, headphones, and chargers"],
     )
+
 
 class Product(BaseModel):
     name: str = Field(
-        ...,
-        title="Product Name",
-        description="The name of the product.",
-        min_length=1,
-        max_length=50, 
-        pattern=r"^[\w-]+$",
-        examples=["Samsung", "iPhone"]
+        default_factory=str,
+        title="Name",
+        description="Name of the product",
+        max_length=50,
+        min_length=2,
+        pattern=r"^[\w\s-]+$",
+        examples=["SM-G973F", "iPhone 12"],
     )
     description: str = Field(
-        ...,
-        title="Product Description",
-        description="The description of the product.",
-        min_length=1,
-        max_length=255
+        default="",
+        title="Description",
+        description="Description of the product",
+        max_length=200,
+        examples=["Samsung Galaxy S10", "The latest iPhone"],
     )
     price: float = Field(
-        ...,
-        title="Product Price",
-        description="The price of the product.",
-        ge=0.0,
-        lt=100000.0, 
-        examples=[9.99, 19.99]
+        title="Price",
+        description="Price of the product",
+        gt=0,
+        lt=100000,
+        allow_inf_nan=False,
+        examples=[799.99, 1299.99],
     )
     category: Category
 
-    @field_validator('price', mode='before')
+    @field_validator("price", mode="after")
     @classmethod
-
-    def price_check(cls, value: float) -> float:
-        if round(value % 1, 2) != 0.99:
-            raise ValueError("Price should end with '.99'")
-        return value
+    def price_ends_with_99(cls, v: float) -> float:
+        if round(v % 1, 2) != 0.99:
+            raise ValueError("Price must end with 0.99")
+        return v
