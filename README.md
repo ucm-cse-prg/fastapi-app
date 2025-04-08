@@ -1,7 +1,5 @@
 # FastAPI Application Template
 
-![Coverage Status](https://coveralls.io/repos/github/ucm-cse-prg/{{ (github.repository.split('/'))[1] }}/badge.svg?branch=main)
-
 This repository provides a template for creating a FastAPI application with MongoDB (via Beanie and Motor) integration and includes a command-line interface built with Typer. It also supports Docker containerization and unit testing with pytest, making deployment and development easier.
 
 ## Table of Contents
