@@ -1,3 +1,7 @@
+"""
+Configuration settings for the application.
+"""
+
 from functools import lru_cache
 
 from pydantic import Field

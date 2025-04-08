@@ -9,7 +9,7 @@ from beanie import init_beanie
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from app.config import get_settings
-from app.documents import Product
+from app.documents import DOCUMENTS
 
 # Retrieve application settings which include MongoDB connection details.
 SETTINGS = get_settings()
@@ -21,7 +21,7 @@ async def init_mongo() -> None:
 
     This function creates a Motor client using the MongoDB URL from the settings,
     selects the database specified in settings, and initializes Beanie with the document
-    models (currently only the Product document). It should be called during application startup.
+    models. It should be called during application startup.
 
     Raises:
         Exception: If unable to connect to MongoDB or initialize Beanie.
@@ -34,7 +34,7 @@ async def init_mongo() -> None:
     db = client[SETTINGS.db_name]
 
     # Initialize Beanie with the database and the list of document models.
-    await init_beanie(database=db, document_models=[Product])
+    await init_beanie(database=db, document_models=DOCUMENTS)
 
 
 async def drop_database() -> None:

@@ -1,28 +1,14 @@
 """
-Module for defining database document models.
-
-This module uses Beanie's Document base class combined with Pydantic models
-to define the schema of documents stored in the MongoDB collection.
+Database document models for Beanie ODM with MongoDB.
 """
 
 from beanie import Document
 
-from app.models import Product as ProductModel
+# The DOCUMENTS list is used to register all document models with Beanie.
+DOCUMENTS: list[
+    Document
+] = []  # List to hold all document models for Beanie initialization.
 
 
-class Product(Document, ProductModel):
-    """
-    Database document for a Product.
-
-    This class inherits from Beanie's Document to facilitate MongoDB operations,
-    and from ProductModel for the product schema definition.
-    """
-
-    class Settings:
-        """
-        Beanie settings for the Product document.
-
-        Specifies the MongoDB collection name where Product documents are stored.
-        """
-
-        name = "products"
+# Define Beanie document models that represent your MongoDB collections.
+# Use Beanie's Document base class combined with Pydantic models

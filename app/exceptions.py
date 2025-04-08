@@ -1,6 +1,12 @@
+"""
+Custom exceptions for API error handling.
+
+This file defines custom exceptions that should be used to provide graceful error handling,
+logging, as well as meaningful HTTP responses with error messages to the client.
+"""
+
 import logging
 
-from beanie import PydanticObjectId
 from fastapi import status
 
 logger = logging.getLogger("uvicorn.error")
@@ -35,21 +41,7 @@ class InternalServerError(APIException):
 
     def __init__(self, detail: str):
         # Initialize with HTTP 500 status code and a generic internal server error message.
-        super().__init__(
-            code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error"
-        )
+        super().__init__(code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=detail)
 
 
-class ProductNotFound(APIException):
-    """
-    Exception raised when a product is not found in the database (HTTP 404).
-
-    Inherits from APIException and provides a detailed message including the product ID.
-    """
-
-    def __init__(self, product_id: PydanticObjectId):
-        # Initialize with HTTP 404 status code and a message specifying the missing product's ID.
-        super().__init__(
-            code=status.HTTP_404_NOT_FOUND,
-            detail=f"Product with ID {product_id} not found",
-        )
+# Implement custom exceptions to handle different types of API errors.
