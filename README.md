@@ -1,10 +1,8 @@
-# FastAPI CRUD Application with Beanie ODM
+# FastAPI Application Template
 
-[![Coverage Status](https://coveralls.io/repos/github/ucm-cse-prg/fastapi-app/badge.svg?branch=main)](https://coveralls.io/github/ucm-cse-prg/fastapi-app?branch=main)
+[![Coverage Status](https://coveralls.io/repos/github/ucm-cse-prg/{{ (github.repository.split('/'))[1] }}/badge.svg?branch=main)](https://coveralls.io/github/ucm-cse-prg/{{ (github.repository.split('/'))[1] }}?branch=main)
 
-This project is a simple CRUD application built with FastAPI, MongoDB (via Beanie and Motor), and Typer for command-line interface commands. It also offers Docker support and unit tests with pytest, making deployment and testing easy.
-
-The application allows users to perform CRUD operations on products via a RESTful API.
+This repository provides a template for creating a FastAPI application with MongoDB (via Beanie and Motor) integration and includes a command-line interface built with Typer. It also supports Docker containerization and unit testing with pytest, making deployment and development easier.
 
 ## Table of Contents
 
@@ -12,43 +10,39 @@ The application allows users to perform CRUD operations on products via a RESTfu
 - [Project Structure](#project-structure)
 - [Installation](#installation)
 - [Usage](#usage)
-    - [Installation](#installation)
-    - [Configuration](#configuration)
-    - [MongoDB Initialization](#mongodb-initialization)
-    - [Running the Application](#running-the-application)
 - [API Reference](#api-reference)
 - [Development](#development)
-    - [IDE Setup](#ide-setup)
-    - [Testing](#testing)
-    - [Docker](#docker)
+- [Docker](#docker)
 - [Contributing](#contributing)
 - [License](#license)
 
 ## Project Overview
 
-This sample project demonstrates:
+This template project demonstrates:
 
 - Asynchronous programming with FastAPI.
 - Integration with MongoDB using the Beanie ODM.
-- CRUD operations for product management.
-- A command-line interface (via Typer) for server management.
+- Basic CRUD operations through generic API endpoints.
+- A command-line interface (via Typer) for application management.
 - Containerization using Docker.
-- Testing with pytest and static analysis with ruff.
+- Testing with pytest and static analysis with Ruff.
+
+These features serve as a starting point for building and scaling your own web applications.
 
 ## Project Structure
 
 ```
 fastapi-app/
 ├── app
-│   ├── api.py             # API endpoints (GET, POST, PATCH, DELETE)
-│   ├── actions.py         # Business logic for CRUD operations
+│   ├── api.py             # API endpoints (generic GET, POST, PATCH, DELETE)
+│   ├── actions.py         # Business logic operations
 │   ├── cli.py             # CLI commands using Typer
-│   ├── config.py          # Application configuration (MongoDB, admin email, etc.)
+│   ├── config.py          # Application configuration (MongoDB, server settings, etc.)
 │   ├── dependencies.py    # Dependency injection and error handling decorators
 │   ├── documents.py       # Database document schemas (Beanie and Pydantic models)
-│   ├── exceptions.py      # Custom exception classes (e.g., InternalServerError, NotFound)
+│   ├── exceptions.py      # Custom exception classes for error handling
 │   ├── mongo.py           # MongoDB connection initialization and Beanie setup
-│   ├── models.py          # Pydantic models for Product and Category
+│   ├── models.py          # Pydantic models for application data
 │   └── schemas.py         # Request and response schemas for API endpoints
 ├── tests
 │   ├── conftest.py        # Pytest fixtures (async HTTP client, event loop configuration)
@@ -60,15 +54,13 @@ fastapi-app/
 └── README.md              # Project documentation (this file)
 ```
 
-## Usage
-
-### Installation
+## Installation
 
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/ucm-cse-prg/fastapi-app.git
-   cd fastapi-app
+   git clone https://github.com/ucm-cse-prg/{{ (github.repository.split('/'))[1] }}.git
+   cd {{ (github.repository.split('/'))[1] }}
    ```
 
 2. **Install UV:**
@@ -87,9 +79,11 @@ fastapi-app/
    uv sync
    ```
 
+## Usage
+
 ### Configuration
 
-The application configuration is managed in `app/config.py` and can be customized via environment variables or a `.env` file.
+Application settings are managed in `app/config.py` and can be customized via environment variables or a `.env` file.
 
 Example `.env` file:
 
@@ -100,23 +94,23 @@ PORT=8000
 
 ### MongoDB Initialization
 
-The MongoDB connection is initialized by the asynchronous `init_mongo()` function in `app/mongo.py`. The recommended way to run MongoDB locally is using Docker:
+The MongoDB connection is initialized by the asynchronous `init_mongo()` function in `app/mongo.py`. To run MongoDB locally, you can use Docker:
 
 ```bash
 docker run -d -p 27017:27017 --name mongodb mongo
 ```
 
-*Tip: You might need to create a custom network for proper DNS resolution in Docker setups.*
+*Tip: A custom Docker network may be required for proper DNS resolution.*
 
 ### Running the Application
 
-Before running the application, ensure that MongoDB is installed and running on your machine. You can run the server in development mode with:
+Ensure that MongoDB is running on your machine, then start the server in development mode with:
 
 ```bash
 uv run fastapi-app
 ```
 
-For more options, use:
+Additional options can be viewed with:
 
 ```bash
 uv run fastapi-app --help
@@ -128,31 +122,24 @@ You can also specify host, port, and MongoDB URL:
 uv run fastapi-app --host <HOST> --port <PORT> --mongodb-url=mongodb://localhost:27017
 ```
 
-Or, for a development shortcut:
-
-```bash
-uv run fastapi dev
-```
-
 ## API Reference
 
-The API endpoints (defined in `app/api.py`) include:
+The API is designed to be generic. Endpoints include:
 
-- **`GET /products/`** – List all products.
-- **`GET /products/{product_id}`** – Retrieve a product by its ID.
-- **`POST /products/`** – Create a new product.
-- **`PATCH /products/{product_id}`** – Update an existing product.
-- **`DELETE /products/{product_id}`** – Delete a product.
+- **`GET /items/`** – Retrieve a list of items.
+- **`GET /items/{id}`** – Retrieve a single item by its ID.
+- **`POST /items/`** – Create a new item.
+- **`PATCH /items/{id}`** – Update an existing item.
+- **`DELETE /items/{id}`** – Delete an item.
 
-You can view the interactive Swagger UI at:  
-`http://fastapi-app:8000/docs`  
-(Replace `fastapi-app` and port number with your configuration if needed.)
+You can test the API using the interactive Swagger UI at:  
+`http://localhost:8000/docs`
 
 ## Development
 
 ### IDE Setup
 
-For a better development experience, consider using VSCode with the following extensions:
+Recommended VSCode extensions for optimal development:
 - Python
 - Ruff
 - MyPy Type Checker
@@ -161,51 +148,23 @@ For a better development experience, consider using VSCode with the following ex
 - Docker
 - MongoDB for VSCode
 
-### Run the test suite using pytest:
+### Testing
+
+Run the test suite with:
 
 ```bash
 uv run pytest --cov=app
 ```
 
-##### Summary of All Tests
+### Linting & Static Analysis
 
-This project includes a comprehensive test suite for the API endpoints. The tests cover:
-
-- **Product Creation:**
-    - Creating a valid product and verifying the returned data.
-    - Validating input constraints by rejecting products with:
-        - Prices below the minimum or above the maximum allowed.
-        - Invalid names (e.g., names with spaces violating the regex).
-
-- **Product Retrieval:**
-    - Retrieving an existing product by its ID.
-    - Ensuring a deleted product cannot be retrieved (expecting a 404 response).
-
-- **Product Update:**
-    - Successfully updating product details.
-    - Rejecting updates with invalid data like negative prices, incorrect name formats, or prices that do not end with 0.99.
-    - Handling update requests for non-existent products.
-
-- **Product Deletion:**
-    - Deleting a product and verifying it has been removed.
-    - Attempting to delete non-existent products with appropriate error responses.
-
-- **Bulk Operations:**
-    - Creating multiple products in succession.
-    - Retrieving all products to ensure the product list is updated correctly.
-
-- **Error Handling:**
-    - Triggering an internal server error by simulating a disconnect from the database, and verifying the system's error responses.
-
-These tests ensure the reliability and robustness of the API in handling both valid and invalid scenarios.
-
-### Run Ruff linting and static analysis:
+Run Ruff linting:
 
 ```bash
 uv run ruff check
 ```
 
-### Run type checking with MyPy:
+Run type checking with MyPy:
 
 ```bash
 uv run mypy app
@@ -213,12 +172,12 @@ uv run mypy app
 
 ## Docker
 
-You can build and run the application using Docker:
+Build and run the application using Docker:
 
 1. **Build the Docker image:**
 
    ```bash
-   docker build -t fastapi-app .
+   docker build -t {{ (github.repository.split('/'))[1] }} .
    ```
 
 2. **Alternatively, use Docker Compose to run both the app and MongoDB:**
@@ -232,7 +191,7 @@ You can build and run the application using Docker:
 Contributions are welcome! To contribute:
 
 - Open an issue or submit a pull request with improvements or bug fixes.
-- Follow existing coding standards and include tests when applicable.
+- Follow the project's coding standards and include tests where applicable.
 
 ## License
 
