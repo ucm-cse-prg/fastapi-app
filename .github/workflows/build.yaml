@@ -1,6 +1,10 @@
 name: Build
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   release:
@@ -65,8 +69,7 @@ jobs:
         with:
           context: .
           push: true
-          # tags: ucm-cse-prg/fastapi-app:${{ needs.release.outputs.version }}, ucm-cse-prg/fastapi-app:latest
-          tags: ghcr.io/ucm-cse-prg/fastapi-app:${{ needs.release.outputs.version }}, ghcr.io/ucm-cse-prg/fastapi-app:latest
+          tags: ghcr.io/{{ github.repository }}:${{ needs.release.outputs.version }}, ghcr.io/{{ github.repository }}:latest
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Generate artifact attestation
